@@ -52,6 +52,29 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
+
+        // Additional tests
+        try {
+            assertThrows(IllegalArgumentException::class.java) { sortTimes("input/time_test2.txt", "temp.txt") }
+        } finally {
+            File("temp.txt").delete()
+        }
+
+        try {
+            sortTimes("input/time_test1.txt", "temp.txt")
+            assertFileContent(
+                "temp.txt",
+                """
+                    12:00:00 AM
+                    03:30:40 AM
+                    12:00:00 PM
+                    01:02:03 PM
+                    03:30:40 PM
+                """.trimIndent()
+            )
+        } finally {
+            File("temp.txt").delete()
+        }
     }
 
     protected fun sortAddresses(sortAddresses: (String, String) -> Unit) {
@@ -134,6 +157,25 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         try {
             sortTemperatures("input/empty.txt", "temp.txt")
             assertFileContent("temp.txt", "")
+        } finally {
+            File("temp.txt").delete()
+        }
+
+        //Additional tests
+        try {
+            sortTemperatures("input/temperature_test2.txt", "temp.txt")
+            assertFileContent(
+                "temp.txt",
+                """
+                    -15.0
+                    -10.0
+                    1.0
+                    1.0
+                    2.0
+                    3.0
+                    3.0
+                """.trimIndent()
+            )
         } finally {
             File("temp.txt").delete()
         }
