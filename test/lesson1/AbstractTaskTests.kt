@@ -1,6 +1,7 @@
 package lesson1
 
 import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Assertions.assertThrows
 import util.PerfResult
 import util.estimate
 import java.io.BufferedWriter
@@ -136,6 +137,7 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
+
 
         fun testGeneratedTemperatures(size: Int): PerfResult<Unit> {
             try {

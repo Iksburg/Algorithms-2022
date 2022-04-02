@@ -2,6 +2,8 @@
 
 package lesson1
 
+import java.io.File
+
 /**
  * Сортировка времён
  *
@@ -32,8 +34,35 @@ package lesson1
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
+// Ресурсоемкость алгоритма: O(N); Трудоемкость алгоритма: O(NlogN).
+
 fun sortTimes(inputName: String, outputName: String) {
-    TODO()
+    File(outputName).bufferedWriter().use { writer ->
+        val timeList = mutableListOf<Pair<String, Int>>()
+
+        for (line in File(inputName).readLines()) {
+            if (!line.matches(Regex("""((0[0-9]|1[0-2]):[0-5][0-9]:[0-5][0-9]) (AM|PM)"""))) {
+                throw IllegalArgumentException("Введённые данные не соответствуют формату: ЧЧ:ММ:СС AM/PM")
+            } else {
+                val firstSortedList = line.split(" ")
+                val secondCountingList = firstSortedList[0].split(":").map { it.toInt() }
+                var timeInSeconds: Int = if (firstSortedList[1] == "PM") {
+                    if (secondCountingList[0] == 12) secondCountingList[0] * 3600
+                    else (secondCountingList[0] + 12) * 3600
+                } else {
+                    if (secondCountingList[0] == 12) 0
+                    else (secondCountingList[0]) * 3600
+                }
+                timeInSeconds += secondCountingList[1] * 60 + secondCountingList[2]
+                timeList.add(Pair(line, timeInSeconds))
+            }
+        }
+
+        timeList.sortBy { it.second }
+        for (time in timeList) {
+            writer.write(time.first + "\n")
+        }
+    }
 }
 
 /**
@@ -96,8 +125,30 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 99.5
  * 121.3
  */
+//Трудоемкость - O(N), ресурсоемкость - O(N) Ресурсоемкость алгоритма: O(N); Трудоемкость алгоритма: O(NlogN).
+
 fun sortTemperatures(inputName: String, outputName: String) {
-    TODO()
+    File(outputName).bufferedWriter().use {
+        val plusTemperatures = mutableListOf<Int>()
+        val minusTemperatures = mutableListOf<Int>()
+
+        for (line in File(inputName).readLines()) {
+            val tmp = (line.toDouble() * 10).toInt()
+            if (tmp in 0..5000) plusTemperatures += tmp
+            else if (tmp < 0 && tmp >= -2730) minusTemperatures += -tmp
+            else throw IllegalArgumentException()
+        }
+
+        val arrayNegativeValues = countingSort(minusTemperatures.toIntArray(), 2730)
+        for (i in arrayNegativeValues.size - 1 downTo 0) {
+            it.write((-arrayNegativeValues[i] / 10.0).toString() + "\n")
+        }
+
+        val arrayPositiveValues = countingSort(plusTemperatures.toIntArray(), 5000)
+        for (i in arrayPositiveValues.indices) {
+            it.write((arrayPositiveValues[i] / 10.0).toString() + "\n")
+        }
+    }
 }
 
 /**
@@ -129,6 +180,7 @@ fun sortTemperatures(inputName: String, outputName: String) {
  * 2
  * 2
  */
+//Трудоемкость - O(N), ресурсоемкость - O(N)
 fun sortSequence(inputName: String, outputName: String) {
     TODO()
 }
