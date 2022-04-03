@@ -2,6 +2,7 @@ package lesson3
 
 import java.util.*
 import kotlin.math.max
+import kotlin.NoSuchElementException
 
 // attention: Comparable is supported but Comparator is not
 class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSortedSet<T> {
@@ -9,6 +10,7 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
     private class Node<T>(
         val value: T
     ) {
+        var parent: Node<T>? = null
         var left: Node<T>? = null
         var right: Node<T>? = null
     }
@@ -63,6 +65,9 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
                 closest.right = newNode
             }
         }
+        if (closest != null) {
+            newNode.parent = closest
+        }
         size++
         return true
     }
@@ -79,8 +84,47 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
      *
      * Средняя
      */
+
+    private fun changeParent(parent: Node<T>, child: Node<T>?) {
+        if (parent == root) {
+            root = child
+        } else {
+            if (parent == parent.parent!!.right) {
+                parent.parent!!.right = child
+            } else {
+                parent.parent!!.left = child
+            }
+        }
+        if (child != null) {
+            parent.parent = child
+        }
+    }
+
     override fun remove(element: T): Boolean {
-        TODO()
+        val node = find(element)
+        if (node == null || node.value != element) return false
+        if (node.left == null) {
+            changeParent(node, node.right)
+        } else {
+            if (node.right == null) {
+                changeParent(node, node.left)
+            } else {
+                var newNode = node.right!!
+                while (newNode.left != null) {
+                    newNode = newNode.left!!
+                }
+                if (newNode != node.right) {
+                    changeParent(newNode, newNode.right)
+                    newNode.right = node.right
+                    newNode.right!!.parent = newNode
+                }
+                changeParent(node, newNode)
+                newNode.left = node.left
+                newNode.left!!.parent = newNode
+            }
+        }
+        size--
+        return true
     }
 
     override fun comparator(): Comparator<in T>? =
@@ -156,9 +200,12 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
          *
          * Сложная
          */
+        // Ресурсоемкость алгоритма: O(1); Трудоемкость алгоритма: O(logN).
+
         override fun remove() {
-            // TODO
-            throw NotImplementedError()
+            if (currentNode == null) throw IllegalStateException()
+            remove(currentNode!!.value)
+            currentNode = null
         }
 
     }
