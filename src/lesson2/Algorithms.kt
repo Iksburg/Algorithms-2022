@@ -2,6 +2,9 @@
 
 package lesson2
 
+import kotlin.math.floor
+import kotlin.math.sqrt
+
 /**
  * Получение наибольшей прибыли (она же -- поиск максимального подмассива)
  * Простая
@@ -94,8 +97,38 @@ fun josephTask(menNumber: Int, choiceInterval: Int): Int {
  * Если имеется несколько самых длинных общих подстрок одной длины,
  * вернуть ту из них, которая встречается раньше в строке first.
  */
+// Ресурсоемкость алгоритма: O(M*N); Трудоемкость алгоритма: O(M*N), M и N - длины строк.
+
 fun longestCommonSubstring(first: String, second: String): String {
-    TODO()
+    if (first == "" || second == "") {
+        return ""
+    } else if (first == second) {
+        return first
+    } else {
+        val intersectionMatrix: Array<Array<Int>> = Array(first.length + 1) { Array(second.length + 1) { 0 } }
+        var maxLength = 0
+        var indexOfMaxLength = 0
+        for (i in 1 until intersectionMatrix.size) {
+            for (j in 1 until intersectionMatrix[i].size) {
+                if (first[i - 1] == second[j - 1]) {
+                    if (i != 1 && j != 1) {
+                        intersectionMatrix[i][j] = intersectionMatrix[i - 1][j - 1] + 1
+                    } else {
+                        intersectionMatrix[i][j] = 1
+                    }
+                    if (intersectionMatrix[i][j] > maxLength) {
+                        maxLength = intersectionMatrix[i][j]
+                        indexOfMaxLength = i
+                    }
+                }
+            }
+        }
+        return if (maxLength != 0) {
+            first.substring(indexOfMaxLength - maxLength, indexOfMaxLength)
+        } else {
+            ""
+        }
+    }
 }
 
 /**
@@ -108,6 +141,30 @@ fun longestCommonSubstring(first: String, second: String): String {
  * Справка: простым считается число, которое делится нацело только на 1 и на себя.
  * Единица простым числом не считается.
  */
+// Ресурсоемкость алгоритма: O(N); Трудоемкость алгоритма: O(Nlog(logN)).
+
 fun calcPrimesNumber(limit: Int): Int {
-    TODO()
+    if (limit <= 1) {
+        return 0
+    } else {
+        var result = 0
+        val arrayOfPrimes = BooleanArray(limit + 1) { true }
+        arrayOfPrimes[0] = false
+        arrayOfPrimes[1] = false
+
+        for (i in 2..floor(sqrt(limit.toDouble())).toInt()) {
+            if (arrayOfPrimes[i]) {
+                var p = 2
+                while (i * p < arrayOfPrimes.size) {
+                    if (arrayOfPrimes[i * p]) arrayOfPrimes[i * p] = false
+                    p++
+                }
+            }
+        }
+
+        for (i in arrayOfPrimes.indices) {
+            if (arrayOfPrimes[i]) result++
+        }
+        return result
+    }
 }
