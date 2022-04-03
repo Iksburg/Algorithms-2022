@@ -101,8 +101,8 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
     }
 
     override fun remove(element: T): Boolean {
-        val node = find(element)
-        if (node == null || node.value != element) return false
+        val node = find(element) ?: return false
+        if (node.value != element) return false
         if (node.left == null) {
             changeParent(node, node.right)
         } else {
