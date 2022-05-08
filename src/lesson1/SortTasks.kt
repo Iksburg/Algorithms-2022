@@ -125,7 +125,7 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 99.5
  * 121.3
  */
-//Трудоемкость - O(N), ресурсоемкость - O(N) Ресурсоемкость алгоритма: O(N); Трудоемкость алгоритма: O(NlogN).
+//Ресурсоемкость алгоритма: O(N); Трудоемкость алгоритма: O(N).
 
 fun sortTemperatures(inputName: String, outputName: String) {
     File(outputName).bufferedWriter().use {
@@ -180,7 +180,6 @@ fun sortTemperatures(inputName: String, outputName: String) {
  * 2
  * 2
  */
-//Трудоемкость - O(N), ресурсоемкость - O(N)
 fun sortSequence(inputName: String, outputName: String) {
     TODO()
 }

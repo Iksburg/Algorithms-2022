@@ -100,6 +100,8 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
         }
     }
 
+    // Ресурсоемкость алгоритма: O(1); Трудоемкость алгоритма: O(logN).
+
     override fun remove(element: T): Boolean {
         val node = find(element) ?: return false
         if (node.value != element) return false

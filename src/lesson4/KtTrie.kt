@@ -2,6 +2,7 @@ package lesson4
 
 import java.util.*
 
+
 /**
  * Префиксное дерево для строк
  */
@@ -70,8 +71,47 @@ class KtTrie : AbstractMutableSet<String>(), MutableSet<String> {
      *
      * Сложная
      */
-    override fun iterator(): MutableIterator<String> {
-        TODO()
+    override fun iterator(): MutableIterator<String> = TrieIterator()
+
+    inner class TrieIterator : MutableIterator<String> {
+        private val listOfValues: MutableList<String> = ArrayList()
+        private var counter = 0
+        private var current: String? = null
+
+        // Ресурсоемкость алгоритма: O(N); Трудоемкость алгоритма: O(N).
+        init {
+            adding(root, "")
+        }
+
+        private fun adding(node: Node?, element: String) {
+            for (child in node!!.children.keys) {
+                if (child == 0.toChar()) {
+                    listOfValues.add(element)
+                } else {
+                    adding(node.children[child], element + child)
+                }
+            }
+        }
+
+        // Ресурсоемкость алгоритма: O(1); Трудоемкость алгоритма: O(1).
+        override fun hasNext(): Boolean {
+            return counter < listOfValues.size
+        }
+
+        // Ресурсоемкость алгоритма: O(1); Трудоемкость алгоритма: O(1).
+        override fun next(): String {
+            if (counter >= listOfValues.size) throw NoSuchElementException()
+            current = listOfValues[counter]
+            counter++
+            return current as String
+        }
+
+        // Ресурсоемкость алгоритма: O(1); Трудоемкость алгоритма: O(1).
+        override fun remove() {
+            checkNotNull(current)
+            remove(current)
+            current = null
+        }
     }
 
 }

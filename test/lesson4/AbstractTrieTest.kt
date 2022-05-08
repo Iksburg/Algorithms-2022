@@ -112,6 +112,43 @@ abstract class AbstractTrieTest {
         }
     }
 
+    protected fun myIteratorTest() {
+        implementationTest { create().iterator().hasNext() }
+        implementationTest { create().iterator().next() }
+        val controlSet = sortedSetOf<String>()
+        println("Control set: $controlSet")
+        val trieSet = create()
+        assertTrue(
+            !trieSet.iterator().hasNext(),
+            "Iterator of an empty set should not have any next elements."
+        )
+        for (element in controlSet) {
+            trieSet += element
+        }
+        val iterator1 = trieSet.iterator()
+        val iterator2 = trieSet.iterator()
+        println("Checking if calling hasNext() changes the state of the iterator...")
+        while (iterator1.hasNext()) {
+            assertEquals(
+                iterator2.next(), iterator1.next(),
+                "Calling TrieIterator.hasNext() changes the state of the iterator."
+            )
+        }
+        val trieIter = trieSet.iterator()
+        println("Checking if the iterator traverses the entire set...")
+        while (trieIter.hasNext()) {
+            controlSet.remove(trieIter.next())
+        }
+        assertTrue(
+            controlSet.isEmpty(),
+            "TrieIterator doesn't traverse the entire set."
+        )
+        assertFailsWith<NoSuchElementException>("Something was supposedly returned after the elements ended") {
+            trieIter.next()
+        }
+        println("All clear!")
+    }
+
     protected fun doIteratorRemoveTest() {
         implementationTest { create().iterator().remove() }
         val random = Random()
@@ -173,4 +210,64 @@ abstract class AbstractTrieTest {
         }
     }
 
+    protected fun myIteratorRemoveTest() {
+        implementationTest { create().iterator().remove() }
+        val random = Random()
+        for (iteration in 1..100) {
+            val controlSet = mutableSetOf<String>()
+            val removeIndex = random.nextInt(15) + 1
+            var toRemove = ""
+            for (i in 1..15) {
+                val string = random.nextString("abcdefgh", 1, 15)
+                controlSet.add(string)
+                if (i == removeIndex) {
+                    toRemove = string
+                }
+            }
+            println("Initial set: $controlSet")
+            val trieSet = create()
+            for (element in controlSet) {
+                trieSet += element
+            }
+            controlSet.remove(toRemove)
+            println("Control set: $controlSet")
+            println("Removing element \"$toRemove\" from trie set through the iterator...")
+            val iterator = trieSet.iterator()
+            assertFailsWith<IllegalStateException>("Something was supposedly deleted before the iteration started") {
+                iterator.remove()
+            }
+            var counter = trieSet.size
+            while (iterator.hasNext()) {
+                val element = iterator.next()
+                counter--
+                if (element == toRemove) {
+                    iterator.remove()
+                    assertFailsWith<IllegalStateException>("Trie.remove() was successfully called twice in a row.") {
+                        iterator.remove()
+                    }
+                }
+            }
+            assertEquals(
+                0, counter,
+                "TrieIterator.remove() changed iterator position: ${abs(counter)} elements were ${if (counter > 0) "skipped" else "revisited"}."
+            )
+            assertEquals(
+                controlSet.size == 0, trieSet.size == 0,
+                "The set size was ${trieSet.size}, but should be ${controlSet.size}."
+            )
+            for (element in controlSet) {
+                assertTrue(
+                    trieSet.contains(element),
+                    "Trie set doesn't have the element $element from the control set."
+                )
+            }
+            for (element in trieSet) {
+                assertTrue(
+                    controlSet.contains(element),
+                    "Trie set has the element $element that is not in control set."
+                )
+            }
+            println("All clear!")
+        }
+    }
 }
