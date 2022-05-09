@@ -53,7 +53,7 @@ class KtOpenAddressingSet<T : Any>(private val bits: Int) : AbstractMutableSet<T
         val startingIndex = element.startingIndex()
         var index = startingIndex
         var current = storage[index]
-        while (current != null) {
+        while (current != null && current != Remove) {
             if (current == element) {
                 return false
             }
@@ -111,7 +111,7 @@ class KtOpenAddressingSet<T : Any>(private val bits: Int) : AbstractMutableSet<T
     inner class SetIterator : MutableIterator<T> {
         private var index = 0
         private var numberOfElements = 0
-        var currentElement: T? = null
+        private var currentElement: T? = null
 
         // Ресурсоемкость алгоритма: O(1); Трудоемкость алгоритма: O(1).
         override fun hasNext(): Boolean = numberOfElements < size
