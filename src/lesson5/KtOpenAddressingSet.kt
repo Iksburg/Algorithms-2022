@@ -14,6 +14,8 @@ class KtOpenAddressingSet<T : Any>(private val bits: Int) : AbstractMutableSet<T
 
     override var size: Int = 0
 
+    private object Remove
+
     /**
      * Индекс в таблице, начиная с которого следует искать данный элемент
      */
@@ -75,8 +77,23 @@ class KtOpenAddressingSet<T : Any>(private val bits: Int) : AbstractMutableSet<T
      *
      * Средняя
      */
+    // Ресурсоемкость алгоритма: O(1); Трудоемкость алгоритма: O(N).
+
     override fun remove(element: T): Boolean {
-        TODO("not implemented")
+        val firstIndex = element.startingIndex()
+        var index = firstIndex
+        var current = storage[index]
+        while (current != null) {
+            if (current == element) {
+                storage[index] = Remove
+                size--
+                return true
+            }
+            index = (index + 1) % capacity
+            if (index == firstIndex) continue
+            current = storage[index]
+        }
+        return false
     }
 
     /**
@@ -89,7 +106,32 @@ class KtOpenAddressingSet<T : Any>(private val bits: Int) : AbstractMutableSet<T
      *
      * Средняя (сложная, если поддержан и remove тоже)
      */
-    override fun iterator(): MutableIterator<T> {
-        TODO("not implemented")
+    override fun iterator(): MutableIterator<T> = SetIterator()
+
+    inner class SetIterator : MutableIterator<T> {
+        private var index = 0
+        private var numberOfElements = 0
+        var currentElement: T? = null
+
+        // Ресурсоемкость алгоритма: O(1); Трудоемкость алгоритма: O(1).
+        override fun hasNext(): Boolean = numberOfElements < size
+
+        // Ресурсоемкость алгоритма: O(1); Трудоемкость алгоритма: O(N).
+        override fun next(): T {
+            if (!hasNext()) throw NoSuchElementException()
+            while (storage[index] == null || storage[index] is Remove) index++
+            currentElement = storage[index] as T?
+            index++
+            numberOfElements++
+            return currentElement as T
+        }
+
+        // Ресурсоемкость алгоритма: O(1); Трудоемкость алгоритма: O(1).
+        override fun remove() {
+            if (currentElement == null || currentElement is Remove) throw IllegalStateException()
+            storage[index - 1] = Remove
+            numberOfElements--
+            size--
+        }
     }
 }

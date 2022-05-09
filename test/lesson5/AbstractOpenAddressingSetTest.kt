@@ -79,6 +79,31 @@ abstract class AbstractOpenAddressingSetTest {
         }
     }
 
+    protected fun myRemoveTest() {
+        val random = Random()
+        val bitsNumber = random.nextInt(4) + 6
+        val openAddressingSet = create<Int>(bitsNumber)
+        val firstInt = random.nextInt(32)
+        openAddressingSet += firstInt
+        val expectedSize = openAddressingSet.size - 1
+        assertTrue(
+            openAddressingSet.remove(firstInt),
+            "An element wasn't removed contrary to expected."
+        )
+        assertFalse(
+            openAddressingSet.remove(firstInt),
+            "Something was removed contrary to expectations"
+        )
+        assertFalse(
+            firstInt in openAddressingSet,
+            "Set must be empty"
+        )
+        assertEquals(
+            expectedSize, openAddressingSet.size,
+            "The set size must be zero."
+        )
+    }
+
     protected fun doIteratorTest() {
         val random = Random()
         for (iteration in 1..100) {
@@ -117,6 +142,45 @@ abstract class AbstractOpenAddressingSetTest {
             assertFailsWith<NoSuchElementException>("Something was supposedly returned after the elements ended") {
                 openAddressingSetIter.next()
             }
+            println("All clear!")
+        }
+    }
+
+    protected fun myIteratorTest() {
+        val random = Random()
+        for (iteration in 1..100) {
+            val controlSet = mutableSetOf<String>()
+            println("Control set: $controlSet")
+            val openAddressingSet = create<String>(random.nextInt(6) + 4)
+            assertFalse(
+                openAddressingSet.iterator().hasNext(),
+                "Iterator of an empty set should not have any next elements."
+            )
+            val iterator1 = openAddressingSet.iterator()
+            val iterator2 = openAddressingSet.iterator()
+            println("Checking if calling hasNext() changes the state of the iterator...")
+            while (iterator1.hasNext()) {
+                assertEquals(
+                    iterator2.next(), iterator1.next(),
+                    "Calling OpenAddressingSetIterator.hasNext() changes the state of the iterator."
+                )
+            }
+            val openAddressingSetIter = openAddressingSet.iterator()
+            println("Checking if the iterator traverses the entire set...")
+            while (openAddressingSetIter.hasNext()) {
+                controlSet.remove(openAddressingSetIter.next())
+            }
+            assertTrue(
+                controlSet.isEmpty(),
+                "OpenAddressingSetIterator doesn't traverse the entire set."
+            )
+            assertFailsWith<NoSuchElementException>("Something was supposedly returned after the elements ended") {
+                openAddressingSetIter.next()
+            }
+            assertEquals(
+                controlSet, openAddressingSet,
+                "Sets were expected to be equal."
+            )
             println("All clear!")
         }
     }
@@ -176,5 +240,13 @@ abstract class AbstractOpenAddressingSetTest {
             }
             println("All clear!")
         }
+    }
+
+    protected fun myIteratorRemoveTest() {
+        val actualSet = mutableSetOf("g232jf", "22h", "fd73d2", "lo324re28m", "u584i32")
+        val controlSet = mutableSetOf("g232jf", "22h", "fd73d2", "u584i32")
+        val toRemove = "lo324re28m"
+        actualSet.remove(toRemove)
+        assertEquals(actualSet, controlSet)
     }
 }
